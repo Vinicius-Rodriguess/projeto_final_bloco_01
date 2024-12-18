@@ -1,6 +1,6 @@
 import { Produto } from "./Produto"
 
-export class Bolo extends Produto {
+export class Torta extends Produto {
     private _tipoMassa: string
     private _recheio: string
 

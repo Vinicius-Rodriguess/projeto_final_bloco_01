@@ -1,8 +1,14 @@
 import readlinesync = require("readline-sync")
 import { colors } from "./src/util/colors"
+import { ProdutoController } from "./src/controller/ProdutoController"
+import { Bolo } from "./src/model/Bolo"
+import { Torta } from "./src/model/Torta"
 
 export function main() {
-    let opcao: number
+    let opcao, tipo, preco, id: number
+    let nome, cobertura, recheio, tipoMassa: string
+    const tipoProduto = ["Bolo", "Torta"]
+    const produtos = new ProdutoController()
 
     while (true) {
         console.log(`${colors.bg.blackbright}${colors.fg.black}                                                             ${colors.reset}`)
@@ -30,17 +36,38 @@ export function main() {
                 console.log(colors.fg.whitestrong,
                     "\n\nCriar Produto\n\n", colors.reset)
 
+                nome = readlinesync.question("Digite o Nome do Produto: ")
+                tipo = readlinesync.keyInSelect(tipoProduto, "", { cancel: false }) + 1
+                preco = readlinesync.questionFloat("Digite o preco: ")
+                recheio = readlinesync.question("Digite o Recheio do Produto: ")
+
+                switch (tipo) {
+                    case 1:
+                        cobertura = readlinesync.question("Digite a Cobertura do Produto: ")
+                        produtos.cadastrar(new Bolo(produtos.gerarId(), nome, tipo, preco, cobertura, recheio))
+                        break
+                    case 2:
+                        tipoMassa = readlinesync.question("Digite o Tipo da Massa do Produto: ")
+                        produtos.cadastrar(new Torta(produtos.gerarId(), nome, tipo, preco, tipoMassa, recheio))
+                        break
+                }
+
                 keyPress()
                 break
             case 2:
                 console.log(colors.fg.whitestrong,
                     "\n\nListar todos os Produtos\n\n", colors.reset)
 
+                produtos.listarTodas()
+
                 keyPress()
                 break
             case 3:
                 console.log(colors.fg.whitestrong,
-                    "\n\nConsultar dados doProduto - por ID\n\n", colors.reset)
+                    "\n\nConsultar dados do Produto - Por ID\n\n", colors.reset)
+
+                id = readlinesync.questionInt("Digite o id: ")
+                produtos.procurarPorId(id)
 
                 keyPress()
                 break
@@ -48,11 +75,37 @@ export function main() {
                 console.log(colors.fg.whitestrong,
                     "\n\nAtualizar dados do Produto\n\n", colors.reset)
 
+                id = readlinesync.questionInt("Digite o Id do Produto: ")
+                let produto = produtos.buscarNoArray(id)
+
+                if (produto !== null) {
+                    nome = readlinesync.question("Digite o Nome do Produto: ")
+                    tipo = produto.tipo
+                    preco = readlinesync.questionFloat("Digite o preco: ")
+                    recheio = readlinesync.question("Digite o Recheio do Produto: ")
+
+                    switch (tipo) {
+                        case 1:
+                            cobertura = readlinesync.question("Digite a Cobertura do Produto: ")
+                            produtos.atualizar(new Bolo(id, nome, tipo, preco, cobertura, recheio))
+                            break
+                        case 2:
+                            tipoMassa = readlinesync.question("Digite o Tipo da Massa do Produto: ")
+                            produtos.atualizar(new Torta(id, nome, tipo, preco, tipoMassa, recheio))
+                            break
+                    }
+
+                } else
+                    console.log("Produto não Encontrado!")
+
                 keyPress()
                 break
             case 5:
                 console.log(colors.fg.whitestrong,
                     "\n\nApagar um Produto\n\n", colors.reset)
+
+                    id = readlinesync.questionInt("Digite o id: ")
+                    produtos.deletar(id)    
 
                 keyPress()
                 break
