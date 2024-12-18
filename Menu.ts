@@ -4,123 +4,129 @@ import { ProdutoController } from "./src/controller/ProdutoController"
 import { Bolo } from "./src/model/Bolo"
 import { Torta } from "./src/model/Torta"
 
-export function main() {
-    let opcao, tipo, preco, id: number
-    let nome, cobertura, recheio, tipoMassa: string
-    const tipoProduto = ["Bolo", "Torta"]
-    const produtos = new ProdutoController()
+const produtosController = new ProdutoController()
+
+const main = ():void => {
 
     while (true) {
-        console.log(`${colors.bg.blackbright}${colors.fg.black}                                                             ${colors.reset}`)
-        console.log(`${colors.bg.white}${colors.fg.black}                Doce Encanto - Confeitaria                   ${colors.reset}`)
-        console.log(`${colors.bg.blackbright}                                                             ${colors.reset}`)
-        console.log(`${colors.bg.white}${colors.fg.black}   1 - Criar Produto                                         ${colors.reset}`)
-        console.log(`${colors.bg.white}${colors.fg.black}   2 - Listar todas os Produtos                              ${colors.reset}`)
-        console.log(`${colors.bg.white}${colors.fg.black}   3 - Buscar Produto por ID                                 ${colors.reset}`)
-        console.log(`${colors.bg.white}${colors.fg.black}   4 - Atualizar Dados do Produto                            ${colors.reset}`)
-        console.log(`${colors.bg.white}${colors.fg.black}   5 - Apagar Produto                                        ${colors.reset}`)
-        console.log(`${colors.bg.white}${colors.fg.black}   6 - Sair                                                  ${colors.reset}`)
-        console.log(`${colors.bg.blackbright}                                                             ${colors.reset}`)
+        exibirMenu()
 
-        console.log("Entre com a opção desejada: ")
-        opcao = readlinesync.questionInt("")
-
-        if (opcao == 6) {
-            sobre()
-            console.log(colors.reset, "")
-            process.exit(0)
+        const operacoes: { [key: number]: () => void } = {
+            1: criarProduto,
+            2: listarProdutos,
+            3: consultarProduto,
+            4: atualizarProduto,
+            5: apagarProduto,
+            6: sair
         }
 
-        switch (opcao) {
-            case 1:
-                console.log(colors.fg.whitestrong,
-                    "\n\nCriar Produto\n\n", colors.reset)
+        const opcao = readlinesync.questionInt("Entre com a opcao desejada: ")
 
-                nome = readlinesync.question("Digite o Nome do Produto: ")
-                tipo = readlinesync.keyInSelect(tipoProduto, "", { cancel: false }) + 1
-                preco = readlinesync.questionFloat("Digite o preco: ")
-                recheio = readlinesync.question("Digite o Recheio do Produto: ")
+        try {
+            operacoes[opcao]()
 
-                switch (tipo) {
-                    case 1:
-                        cobertura = readlinesync.question("Digite a Cobertura do Produto: ")
-                        produtos.cadastrar(new Bolo(produtos.gerarId(), nome, tipo, preco, cobertura, recheio))
-                        break
-                    case 2:
-                        tipoMassa = readlinesync.question("Digite o Tipo da Massa do Produto: ")
-                        produtos.cadastrar(new Torta(produtos.gerarId(), nome, tipo, preco, tipoMassa, recheio))
-                        break
-                }
-
-                keyPress()
-                break
-            case 2:
-                console.log(colors.fg.whitestrong,
-                    "\n\nListar todos os Produtos\n\n", colors.reset)
-
-                produtos.listarTodas()
-
-                keyPress()
-                break
-            case 3:
-                console.log(colors.fg.whitestrong,
-                    "\n\nConsultar dados do Produto - Por ID\n\n", colors.reset)
-
-                id = readlinesync.questionInt("Digite o id: ")
-                produtos.procurarPorId(id)
-
-                keyPress()
-                break
-            case 4:
-                console.log(colors.fg.whitestrong,
-                    "\n\nAtualizar dados do Produto\n\n", colors.reset)
-
-                id = readlinesync.questionInt("Digite o Id do Produto: ")
-                let produto = produtos.buscarNoArray(id)
-
-                if (produto !== null) {
-                    nome = readlinesync.question("Digite o Nome do Produto: ")
-                    tipo = produto.tipo
-                    preco = readlinesync.questionFloat("Digite o preco: ")
-                    recheio = readlinesync.question("Digite o Recheio do Produto: ")
-
-                    switch (tipo) {
-                        case 1:
-                            cobertura = readlinesync.question("Digite a Cobertura do Produto: ")
-                            produtos.atualizar(new Bolo(id, nome, tipo, preco, cobertura, recheio))
-                            break
-                        case 2:
-                            tipoMassa = readlinesync.question("Digite o Tipo da Massa do Produto: ")
-                            produtos.atualizar(new Torta(id, nome, tipo, preco, tipoMassa, recheio))
-                            break
-                    }
-
-                } else
-                    console.log("Produto não Encontrado!")
-
-                keyPress()
-                break
-            case 5:
-                console.log(colors.fg.whitestrong,
-                    "\n\nApagar um Produto\n\n", colors.reset)
-
-                    id = readlinesync.questionInt("Digite o id: ")
-                    produtos.deletar(id)    
-
-                keyPress()
-                break
-            default:
-                console.log(colors.fg.whitestrong,
-                    "\nOpção Inválida!\n", colors.reset)
-
-                keyPress()
-                break
+        } catch(e) {
+            console.log(colors.fg.whitestrong,"\nOpção Inválida!\n", colors.reset)
+            keyPress()
         }
     }
 
 }
 
-function sobre(): void {
+const exibirMenu = (): void => {
+    console.log(" ")
+    console.log(`${colors.bg.blackbright}${colors.fg.black}                                                             ${colors.reset}`)
+    console.log(`${colors.bg.white}${colors.fg.black}                Doce Encanto - Confeitaria                   ${colors.reset}`)
+    console.log(`${colors.bg.blackbright}                                                             ${colors.reset}`)
+    console.log(`${colors.bg.white}${colors.fg.black}   1 - Criar Produto                                         ${colors.reset}`)
+    console.log(`${colors.bg.white}${colors.fg.black}   2 - Listar todos os Produtos                              ${colors.reset}`)
+    console.log(`${colors.bg.white}${colors.fg.black}   3 - Buscar Produto por ID                                 ${colors.reset}`)
+    console.log(`${colors.bg.white}${colors.fg.black}   4 - Atualizar Dados do Produto                            ${colors.reset}`)
+    console.log(`${colors.bg.white}${colors.fg.black}   5 - Apagar Produto                                        ${colors.reset}`)
+    console.log(`${colors.bg.white}${colors.fg.black}   6 - Sair                                                  ${colors.reset}`)
+    console.log(`${colors.bg.blackbright}                                                             ${colors.reset}`)
+}
+
+const criarProduto = (): void => {
+    console.log(colors.fg.whitestrong, "\nCriar Produto\n", colors.reset)
+    const tipoProduto = ["Bolo", "Torta"]
+    const tipo = readlinesync.keyInSelect(tipoProduto, "", { cancel: false }) + 1
+    const nome = readlinesync.question("Digite o Nome do Produto: ")
+    const preco = readlinesync.questionFloat("Digite o Preco do Produto: ")
+    const recheio = readlinesync.question("Digite o Recheio do Produto: ")
+
+    switch (tipo) {
+        case 1:
+            const cobertura = readlinesync.question("Digite a Cobertura do Produto: ")
+            produtosController.cadastrar(new Bolo(produtosController.gerarId(), nome, tipo, preco, cobertura, recheio))
+            break
+        case 2:
+            const tipoMassa = readlinesync.question("Digite o Tipo da Massa do Produto: ")
+            produtosController.cadastrar(new Torta(produtosController.gerarId(), nome, tipo, preco, tipoMassa, recheio))
+            break
+    }
+
+    keyPress()
+}
+
+const listarProdutos = (): void => {
+    console.log(colors.fg.whitestrong, "\nListar todos os Produtos\n", colors.reset)
+    produtosController.listarTodos()
+    keyPress()
+}
+
+const consultarProduto = (): void => {
+    console.log(colors.fg.whitestrong, "\nConsultar dados do Produto - Por ID\n", colors.reset)
+
+    const id = readlinesync.questionInt("Digite o id: ")
+    produtosController.procurarPorId(id)
+
+    keyPress()
+}
+
+const atualizarProduto = (): void => {
+    console.log(colors.fg.whitestrong, "\nAtualizar dados do Produto\n", colors.reset)
+
+    const id = readlinesync.questionInt("Digite o Id do Produto: ")
+    const produto = produtosController.verificarProdutoExistente(id)
+
+    if (!produto) return
+
+    const tipo = produto.tipo
+    const nome = readlinesync.question("Digite o Nome do Produto: ")
+    const preco = readlinesync.questionFloat("Digite o preco: ")
+    const recheio = readlinesync.question("Digite o Recheio do Produto: ")
+
+    switch (tipo) {
+        case 1:
+            const cobertura = readlinesync.question("Digite a Cobertura do Produto: ")
+            produtosController.atualizar(new Bolo(id, nome, tipo, preco, cobertura, recheio))
+            break
+        case 2:
+            const tipoMassa = readlinesync.question("Digite o Tipo da Massa do Produto: ")
+            produtosController.atualizar(new Torta(id, nome, tipo, preco, tipoMassa, recheio))
+            break
+    }
+
+    keyPress()
+}
+
+const apagarProduto = (): void => {
+    console.log(colors.fg.whitestrong, "\nApagar um Produto\n", colors.reset)
+
+    const id = readlinesync.questionInt("Digite o id: ")
+    produtosController.deletar(id)
+
+    keyPress()
+}
+
+const sair = (): void => {
+    sobre()
+    console.log(colors.reset, "")
+    process.exit(0)
+}
+
+const sobre = (): void => {
     console.log(`${colors.bg.blackbright}                                                                                      ${colors.reset}`)
     console.log(`${colors.bg.white}${colors.fg.black}                Doce Encanto - Encantado com Doces                                    ${colors.reset}`)
     console.log(`${colors.bg.blackbright}                                                                                      ${colors.reset}`)
@@ -130,7 +136,7 @@ function sobre(): void {
     console.log(`${colors.bg.blackbright}                                                                                      ${colors.reset}`)
 }
 
-function keyPress(): void {
+const keyPress = (): void => {
     console.log(colors.reset, "")
     console.log("\nPressione enter para continuar...")
     readlinesync.prompt()

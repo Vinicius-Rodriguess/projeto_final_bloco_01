@@ -3,63 +3,57 @@ import { ProdutoRepository } from "../repository/ProdutoRepository"
 import { colors } from "../util/colors"
 
 export class ProdutoController implements ProdutoRepository {
-    listaProdutos = new Array<Produto>()
-    public id: number = 0
+    private _listaProdutos: Produto[] = []
+    private _id: number = 0
 
-    procurarPorId(id: number): void {
-        let buscaProduto = this.buscarNoArray(id)
+    public procurarPorId(id: number): void {
+        const produto = this.verificarProdutoExistente(id)
 
-        if (buscaProduto != null) {
-            buscaProduto.visualizar()
-        } else
-            console.log(colors.fg.red, "\nA Produto id: " + id
-                + " não foi encontrada!", colors.reset)
+        if (produto) {
+            produto.visualizar()
+        }
     }
 
-    listarTodas(): void {
-        this.listaProdutos.forEach(produto => produto.visualizar())
+    public listarTodos(): void {
+        this._listaProdutos.forEach(produto => produto.visualizar())
     }
 
-    cadastrar(produto: Produto): void {
-        this.listaProdutos.push(produto)
-        console.log("O produto foi cadastrado com sucesso!")
+    public cadastrar(produto: Produto): void {
+        this._listaProdutos.push(produto)
+        console.log(`${colors.fg.green}\nO produto foi cadastrado com sucesso!${colors.reset}`)
     }
 
-    atualizar(produto: Produto): void {
-        let buscaProduto = this.buscarNoArray(produto.id)
+    public atualizar(novoProduto: Produto): void {
+        const produto = this.verificarProdutoExistente(novoProduto.id)
 
-        if (buscaProduto != null) {
-            this.listaProdutos[this.listaProdutos.indexOf(buscaProduto)] = produto
-            console.log(colors.fg.green, "\nO Produto numero: " + produto.id +
-                " foi atualizado com sucesso!", colors.reset)
-        } else
-            console.log(colors.fg.red, "\nO Produto id: " + produto.id +
-                " não foi encontrada!", colors.reset)
+        if (produto) {
+            this._listaProdutos[this._listaProdutos.indexOf(produto)] = novoProduto
+            console.log(`${colors.fg.green}\nO Produto número: ${novoProduto.id} foi atualizado com sucesso!${colors.reset}`)
+        } 
     }
 
-    deletar(id: number): void {
-        let buscaProduto = this.buscarNoArray(id)
- 
-        if (buscaProduto != null) {
-            this.listaProdutos.splice(this.listaProdutos.indexOf(buscaProduto), 1)
-        	console.log(colors.fg.green,"\nO produto id: " + id + 
-                        " foi apagado com sucesso!", colors.reset)
-        } else
-        console.log(colors.fg.red,"\nO produto id: " + id + 
-                    " não foi encontrada!", colors.reset)
+    public deletar(id: number): void {
+        const produto = this.verificarProdutoExistente(id)
+
+        if (produto) {
+            this._listaProdutos.splice(this._listaProdutos.indexOf(produto), 1)
+            console.log(`${colors.fg.green}\nO produto id: ${id} foi apagado com sucesso!${colors.reset}`)
+        } 
+    }
+
+    public verificarProdutoExistente(id: number): Produto | null {
+        const produto = this.buscarNoArray(id)
+        if (!produto) {
+            console.log(`${colors.fg.red}\nO produto id: ${id} não foi encontrada!${colors.reset}`)
+        }
+        return produto
     }
 
     public gerarId(): number {
-        return ++this.id
+        return ++this._id
     }
 
     public buscarNoArray(id: number): Produto | null {
-
-        for (let produto of this.listaProdutos) {
-            if (produto.id === id)
-                return produto
-        }
-
-        return null
+        return this._listaProdutos.find(produto => produto.id === id) || null
     }
 }

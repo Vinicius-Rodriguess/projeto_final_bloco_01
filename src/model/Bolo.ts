@@ -29,6 +29,6 @@ export class Bolo extends Produto {
     public visualizar(): void {
         super.visualizar()
         console.log("Cobertura: " + this._cobertura)
-        console.log("Recheio: R$" + this._recheio)
+        console.log("Recheio: " + this._recheio)
     }
 }
